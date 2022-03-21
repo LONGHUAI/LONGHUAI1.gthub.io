@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+    <script src="http://unpkg.com/axios/dist/axios.min.js"></script>
+  </head>
+
+  <body>
+    <div id="app">
+      <input type="text" v-model="query" @keyup.enter="huice" />
+      <p>{{query}}</p>
+
+      <li v-for="item in list">
+        歌曲：{{item.name}}
+        <button @click="playmusic(item.id)">播放</button>
+      </li>
+
+      <div>
+        <!-- 音乐播放器按钮默认设置  controls autoplay loop -->
+        <audio :src="musicUrl" controls autoplay loop></audio>
+      </div>
+    </div>
+
+    <script>
+      new Vue({
+        el: "#app",
+        data: {
+          query: "",
+        //   歌名列表
+          list: [],
+        //   音乐播放
+          musicUrl: "",
+        },
+
+        methods: {
+          huice: function () {
+            // 回调函数没有this
+            var thar = this;
+            axios
+              .get("https://autumnfish.cn/search?keywords=" + this.query)
+              .then(function (response) {
+                //   response这个是形参，接收参数的
+                thar.list = response.data.result.songs;
+                console.log(response);
+              });
+          },
+
+          playmusic: function (musicid) {
+            //   回调函数内没有this，所以用一个变量接收头
+            var thar = this;
+            axios
+              .get("https://autumnfish.cn/song/url?id=" + musicid)
+              //这里不要加分号
+              // 把音乐路径赋值给musicUrl
+
+              .then(function (response) {
+                thar.musicUrl = response.data.data[0].url;
+                // 这个方法是写出ID的
+                console.log(musicid);
+              });
+          },
+        },
+      });
+    </script>
+  </body>
+</html>
